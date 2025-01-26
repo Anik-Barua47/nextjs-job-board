@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import { NextApiRequest, NextApiResponse } from "next";
-import { runMiddleware } from "@/utils/runMiddleware"; // Helper to run middleware in Next.js
+import { runMiddleware } from "@/middleware"; // Helper to run middleware in Next.js
 
 // Extend NextApiRequest to include the `file` property
 interface MulterRequest extends NextApiRequest {
@@ -30,11 +30,23 @@ export const config = {
     },
 };
 
+// Helper function to run Multer middleware in Next.js
+const runMulterMiddleware = (req: NextApiRequest, res: NextApiResponse, middleware: any) => {
+    return new Promise<void>((resolve, reject) => {
+        middleware(req, res, (result: any) => {
+            if (result instanceof Error) {
+                return reject(result);
+            }
+            resolve();
+        });
+    });
+};
+
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
             // Use Multer middleware to process the uploaded file
-            await runMiddleware(req, res, upload.single("file"));
+            await runMulterMiddleware(req, res, upload.single("file"));
 
             // Cast req to MulterRequest to access `file`
             const multerReq = req as MulterRequest;
