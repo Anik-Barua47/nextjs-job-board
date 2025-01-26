@@ -3,6 +3,11 @@ import path from "path";
 import { NextApiRequest, NextApiResponse } from "next";
 import { runMiddleware } from "@/utils/runMiddleware"; // Helper to run middleware in Next.js
 
+// Extend NextApiRequest to include the `file` property
+interface MulterRequest extends NextApiRequest {
+    file: Express.Multer.File; // Add the `file` property from multer
+}
+
 // Configure Multer to store files in the "public/images" folder
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -31,8 +36,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             // Use Multer middleware to process the uploaded file
             await runMiddleware(req, res, upload.single("file"));
 
-            // File is stored in "req.file"
-            const filePath = `/images/${req.file.filename}`; // Public path to the file
+            // Cast req to MulterRequest to access `file`
+            const multerReq = req as MulterRequest;
+            const filePath = `/images/${multerReq.file.filename}`; // Public path to the file
+
             return res.status(200).json({ imagePath: filePath });
         } catch (error) {
             console.error("Upload error:", error);

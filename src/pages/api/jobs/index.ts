@@ -1,8 +1,9 @@
+import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { toSlug } from "@/lib/utils";
 import { nanoid } from "nanoid";
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === "POST") {
         try {
             console.log("Incoming request body:", req.body);
@@ -47,7 +48,10 @@ export default async function handler(req, res) {
             res.status(201).json({ message: "Job created successfully", job });
         } catch (error) {
             console.error("Error creating job:", error);
-            res.status(500).json({ error: error.message });
+
+            // Safely handle the error as an `Error` type
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            res.status(500).json({ error: errorMessage });
         }
     } else {
         res.setHeader("Allow", ["POST"]);

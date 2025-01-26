@@ -23,7 +23,7 @@ export default function AdminNavbar() {
                             await signOut();
                             router.push("/");
                         }}
-                        className="underline"
+                        className="px-4 py-1 bg-black/75 text-white rounded-md"
                     >
                         Log out
                     </button>
