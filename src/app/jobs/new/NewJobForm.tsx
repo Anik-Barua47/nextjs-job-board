@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import LoadingButton from "@/components/LoadingButton";
 import LocationInput from "@/components/locationInput";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -25,8 +26,6 @@ import { useRouter } from "next/navigation";
 
 export default function NewJobForm() {
     const form = useForm<CreateJobValues>();
-
-
     const {
         handleSubmit,
         watch,
@@ -38,6 +37,9 @@ export default function NewJobForm() {
     } = form;
 
     const router = useRouter();
+
+    // State to store and preview the uploaded image
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     async function onSubmit(values: CreateJobValues) {
         try {
@@ -66,6 +68,40 @@ export default function NewJobForm() {
         }
     }
 
+    async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        if (!file) {
+            alert("No file selected.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                console.error("Upload error:", errorData);
+                throw new Error("File upload failed");
+            }
+
+            const data = await res.json();
+            console.log("Uploaded file path:", data.imagePath);
+
+            // Set the preview image and store the file path
+            setPreviewImage(data.imagePath);
+            setValue("companyLogo", data.imagePath);
+        } catch (error) {
+            console.error("File upload error:", error);
+            alert("Failed to upload the image. Please try again.");
+        }
+    }
+
 
 
 
@@ -90,6 +126,7 @@ export default function NewJobForm() {
                         noValidate
                         onSubmit={handleSubmit(onSubmit)}
                     >
+                        {/* Job Title */}
                         <FormField
                             control={control}
                             name="title"
@@ -103,6 +140,8 @@ export default function NewJobForm() {
                                 </FormItem>
                             )}
                         />
+
+                        {/* Job Type */}
                         <FormField
                             control={control}
                             name="type"
@@ -125,6 +164,8 @@ export default function NewJobForm() {
                                 </FormItem>
                             )}
                         />
+
+                        {/* Company Name */}
                         <FormField
                             control={control}
                             name="companyName"
@@ -138,20 +179,36 @@ export default function NewJobForm() {
                                 </FormItem>
                             )}
                         />
+
+                        {/* Company Logo Upload */}
                         <FormField
                             control={control}
                             name="companyLogo"
-                            render={({ field: { value, ...fieldProps } }) => (
+                            render={() => (
                                 <FormItem>
-                                    <FormLabel>Company Logos</FormLabel>
+                                    <FormLabel>Company Logo</FormLabel>
                                     <FormControl>
                                         <Input
-                                            {...fieldProps}
                                             type="file"
                                             accept="image/*"
-                                            onChange={(e) => {
+                                            onChange={async (e) => {
                                                 const file = e.target.files?.[0];
-                                                fieldProps.onChange(file);
+                                                if (file) {
+                                                    const formData = new FormData();
+                                                    formData.append("file", file);
+
+                                                    const res = await fetch("/api/upload", {
+                                                        method: "POST",
+                                                        body: formData,
+                                                    });
+
+                                                    if (res.ok) {
+                                                        const data = await res.json();
+                                                        setValue("companyLogo", data.imagePath); // Save image path in form
+                                                    } else {
+                                                        alert("Image upload failed.");
+                                                    }
+                                                }
                                             }}
                                         />
                                     </FormControl>
@@ -160,6 +217,8 @@ export default function NewJobForm() {
                             )}
                         />
 
+
+                        {/* Location Type */}
                         <FormField
                             control={control}
                             name="locationType"

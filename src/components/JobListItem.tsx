@@ -21,6 +21,13 @@ export default function JobListItem({
     createdAt,
   },
 }: JobListItemProps) {
+  // Add a fallback for dynamic image paths
+  const logoSrc = companyLogoUrl
+    ? companyLogoUrl.startsWith("/")
+      ? companyLogoUrl // For public folder images
+      : `/images/${companyLogoUrl}` // For dynamically uploaded images
+    : companyLogoPlaceholder;
+
   return (
     <article className="flex gap-3 rounded-lg border p-5 hover:bg-muted/60">
       <Image
@@ -30,6 +37,7 @@ export default function JobListItem({
         height={100}
         className="self-center rounded-lg"
       />
+
       <div className="flex-grow space-y-3">
         <div>
           <h2 className="text-xl font-medium">{title}</h2>

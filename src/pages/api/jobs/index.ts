@@ -17,7 +17,7 @@ export default async function handler(req, res) {
                 companyName,
                 applicationEmail,
                 applicationUrl,
-                companyLogoUrl,
+                companyLogo, // Get the uploaded logo path
             } = req.body;
 
             // Validate all required fields
@@ -35,11 +35,11 @@ export default async function handler(req, res) {
                     locationType,
                     location,
                     description,
-                    salary: parseInt(salary, 10),
+                    salary: parseInt(salary, 10), // Ensure salary is an integer
                     companyName,
                     applicationEmail,
                     applicationUrl,
-                    companyLogoUrl,
+                    companyLogoUrl: companyLogo, // Map "companyLogo" to "companyLogoUrl"
                 },
             });
 

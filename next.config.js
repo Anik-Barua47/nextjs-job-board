@@ -1,4 +1,5 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
+module.exports = {
+    images: {
+        unoptimized: true, // Add this to handle images from `public` folder
+    },
+};
