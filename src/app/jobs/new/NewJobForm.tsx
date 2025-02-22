@@ -25,7 +25,10 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
 export default function NewJobForm() {
-  const form = useForm<CreateJobValues>();
+  const form = useForm<CreateJobValues>({
+    resolver: zodResolver(createJobSchema),
+  });
+
   const {
     handleSubmit,
     watch,
@@ -33,8 +36,10 @@ export default function NewJobForm() {
     control,
     setValue,
     setFocus,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = form;
+
+  console.log(errors);
 
   const router = useRouter();
 
@@ -42,6 +47,9 @@ export default function NewJobForm() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   async function onSubmit(values: CreateJobValues) {
+    console.log(form.formState.errors);
+    console.log("Form submitted", values);
+
     try {
       const res = await fetch("/api/jobs", {
         method: "POST",
@@ -50,6 +58,12 @@ export default function NewJobForm() {
         },
         body: JSON.stringify(values),
       });
+
+      const isValid = await trigger();
+      if (!isValid) {
+        console.log("Validation failed");
+        return; // Prevent form submission if validation fails
+      }
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -70,35 +84,21 @@ export default function NewJobForm() {
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (!file) {
-      alert("No file selected.");
-      return;
-    }
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Upload error:", errorData);
-        throw new Error("File upload failed");
+      if (res.ok) {
+        const data = await res.json();
+        setValue("companyLogo", data.imagePath); // Save image path in form
+      } else {
+        alert("Image upload failed.");
       }
-
-      const data = await res.json();
-      console.log("Uploaded file path:", data.imagePath);
-
-      // Set the preview image and store the file path
-      setPreviewImage(data.imagePath);
-      setValue("companyLogo", data.imagePath);
-    } catch (error) {
-      console.error("File upload error:", error);
-      alert("Failed to upload the image. Please try again.");
     }
   }
 
@@ -123,6 +123,22 @@ export default function NewJobForm() {
             noValidate
             onSubmit={handleSubmit(onSubmit)}
           >
+            {/* <FormField
+              control={control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. frontend-developer" {...field} />
+                  </FormControl>
+                  {errors.slug && (
+                    <FormMessage>{errors.slug.message}</FormMessage>
+                  )}
+                </FormItem>
+              )}
+            /> */}
+
             {/* Job Title */}
             <FormField
               control={control}
@@ -137,7 +153,9 @@ export default function NewJobForm() {
                       autoComplete="off"
                     />
                   </FormControl>
-                  <FormMessage />
+                  {errors.title && (
+                    <FormMessage>{errors.title.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -161,7 +179,9 @@ export default function NewJobForm() {
                       ))}
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  {errors.type && (
+                    <FormMessage>{errors.type.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -176,7 +196,9 @@ export default function NewJobForm() {
                   <FormControl>
                     <Input {...field} autoComplete="off" />
                   </FormControl>
-                  <FormMessage />
+                  {errors.companyName && (
+                    <FormMessage>{errors.companyName.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -192,28 +214,12 @@ export default function NewJobForm() {
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const formData = new FormData();
-                          formData.append("file", file);
-
-                          const res = await fetch("/api/upload", {
-                            method: "POST",
-                            body: formData,
-                          });
-
-                          if (res.ok) {
-                            const data = await res.json();
-                            setValue("companyLogo", data.imagePath); // Save image path in form
-                          } else {
-                            alert("Image upload failed.");
-                          }
-                        }
-                      }}
+                      onChange={handleFileChange}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {errors.companyLogo && (
+                    <FormMessage>{errors.companyLogo.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
@@ -246,10 +252,13 @@ export default function NewJobForm() {
                       ))}
                     </Select>
                   </FormControl>
-                  <FormMessage />
+                  {errors.locationType && (
+                    <FormMessage>{errors.locationType.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
+
             <FormField
               control={control}
               name="location"
@@ -275,10 +284,14 @@ export default function NewJobForm() {
                       <span className="text-sm">{watch("location")}</span>
                     </div>
                   )}
-                  <FormMessage />
+                  {errors.location && (
+                    <FormMessage>{errors.location.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
+
+            {/* How to apply */}
             <div className="space-y-2">
               <Label htmlFor="applicationEmail">How to apply</Label>
               <div className="flex justify-between">
@@ -299,7 +312,11 @@ export default function NewJobForm() {
                           <span className="mx-2">or</span>
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      {errors.applicationEmail && (
+                        <FormMessage>
+                          {errors.applicationEmail.message}
+                        </FormMessage>
+                      )}
                     </FormItem>
                   )}
                 />
@@ -320,12 +337,18 @@ export default function NewJobForm() {
                           autoComplete="off"
                         />
                       </FormControl>
-                      <FormMessage />
+                      {errors.applicationUrl && (
+                        <FormMessage>
+                          {errors.applicationUrl.message}
+                        </FormMessage>
+                      )}
                     </FormItem>
                   )}
                 />
               </div>
             </div>
+
+            {/* Job Description */}
             <FormField
               control={control}
               name="description"
@@ -342,10 +365,14 @@ export default function NewJobForm() {
                       ref={field.ref}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {errors.description && (
+                    <FormMessage>{errors.description.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
+
+            {/* Salary */}
             <FormField
               control={control}
               name="salary"
@@ -355,10 +382,13 @@ export default function NewJobForm() {
                   <FormControl>
                     <Input {...field} type="number" />
                   </FormControl>
-                  <FormMessage />
+                  {errors.salary && (
+                    <FormMessage>{errors.salary.message}</FormMessage>
+                  )}
                 </FormItem>
               )}
             />
+
             <LoadingButton type="submit" loading={isSubmitting}>
               Submit
             </LoadingButton>
