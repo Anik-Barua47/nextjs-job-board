@@ -3,14 +3,14 @@ import { Metadata } from "next";
 import AdminNavbar from "./AdminNavbar";
 
 export const metadata: Metadata = {
-    title: "Admin",
+  title: "Admin",
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    return (
-        <ClerkProvider>
-            <AdminNavbar />
-            {children}
-        </ClerkProvider>
-    );
+  return (
+    <ClerkProvider>
+      <AdminNavbar />
+      {children}
+    </ClerkProvider>
+  );
 }
