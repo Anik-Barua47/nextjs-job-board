@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 import { NextApiRequest, NextApiResponse } from "next";
-import { runMiddleware } from "@/middleware"; // Helper to run middleware in Next.js
+// import { runMiddleware } from "../../../middleware";
 
 // Extend NextApiRequest to include the `file` property
 interface MulterRequest extends NextApiRequest {
