@@ -8,10 +8,10 @@ import { LoginSchema } from "../../schemas";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
-  //   console.log(values);
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {
+    // return { error: "Invalid fields!", success: undefined };
     return { error: "Invalid fields!" };
   }
 
@@ -23,16 +23,21 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
       password,
       redirectTo: DEFAULT_LOGIN_REDIRECT,
     });
+
+    // If signIn succeeds, return a success message
+    // return { success: "Login successful!", error: undefined };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
+          // return { error: "Invalid credentials!", success: undefined };
           return { error: "Invalid credentials!" };
         default:
           return { error: "Something went wrong" };
       }
     }
 
+    // For unexpected errors, rethrow them
     throw error;
   }
 };

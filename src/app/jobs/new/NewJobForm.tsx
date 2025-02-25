@@ -39,7 +39,7 @@ export default function NewJobForm() {
     formState: { isSubmitting, errors },
   } = form;
 
-  console.log(errors);
+  // console.log(errors);
 
   const router = useRouter();
 
