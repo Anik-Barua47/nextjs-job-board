@@ -13,10 +13,10 @@ export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
-  console.log("Middleware triggered:", {
-    path: nextUrl.pathname,
-    isLoggedIn,
-  }); // Log middleware activity
+  // console.log("Middleware triggered:", {
+  //   path: nextUrl.pathname,
+  //   isLoggedIn,
+  // }); // Log middleware activity
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
@@ -29,19 +29,19 @@ export default auth((req) => {
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-      console.log("User is logged in, redirecting to default route");
+      // console.log("User is logged in, redirecting to default route");
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
-    console.log("Auth route, no action needed");
+    // console.log("Auth route, no action needed");
     return; // Allow auth routes to proceed
   }
 
   if (!isLoggedIn && !isPublicRoute) {
-    console.log("User not logged in, redirecting to login page");
+    // console.log("User not logged in, redirecting to login page");
     return Response.redirect(new URL("/auth/login", nextUrl));
   }
 
-  console.log("Public route or user logged in, no action needed");
+  // console.log("Public route or user logged in, no action needed");
   return; // Allow public routes or authenticated users to proceed
 });
 
