@@ -10,11 +10,11 @@ export default function Page() {
   useEffect(() => {
     // Show a notification message
     toast(
-      "Your job posting has been submitted. Redirecting to the home page in 5 seconds...",
+      "Your job posting has been submitted. Redirecting to the home page in 3 seconds...",
     );
 
     // Redirect to the home page after 5 seconds
-    const delay = 5000; // Fixed delay of 5 seconds
+    const delay = 3000; // Fixed delay of 3 seconds
     const timer = setTimeout(() => {
       router.push("/");
     }, delay);
