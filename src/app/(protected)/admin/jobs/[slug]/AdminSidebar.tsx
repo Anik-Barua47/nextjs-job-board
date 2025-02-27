@@ -33,7 +33,7 @@ function ApproveSubmissionButton({ jobId }: AdminButtonProps) {
 
   return (
     <form action={formAction} className="space-y-1">
-      <input hidden name="jobId" value={jobId} />
+      <input hidden name="jobId" defaultValue={jobId} />
       <FormSubmitButton className="w-full bg-green-500 hover:bg-green-600">
         Approve
       </FormSubmitButton>
@@ -47,9 +47,11 @@ function ApproveSubmissionButton({ jobId }: AdminButtonProps) {
 function DeleteJobButton({ jobId }: AdminButtonProps) {
   const [formState, formAction] = useFormState(deleteJob, undefined);
 
+  console.log("Form State:", formState); // Debugging
+
   return (
     <form action={formAction} className="space-y-1">
-      <input hidden name="jobId" value={jobId} />
+      <input hidden name="jobId" defaultValue={jobId} />
       <FormSubmitButton className="w-full bg-red-500 hover:bg-red-600">
         Delete
       </FormSubmitButton>
