@@ -24,6 +24,7 @@ import { draftToMarkdown } from "markdown-draft-js";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import UploadImage from "@/components/uploadImage";
+import Image from "next/image";
 
 export default function NewJobForm() {
   const form = useForm<CreateJobValues>({
@@ -201,9 +202,11 @@ export default function NewJobForm() {
                         onUpload={(url) => setValue("companyLogo", url)}
                       />
                       {field.value && (
-                        <img
+                        <Image
                           src={field.value}
                           alt="Company Logo"
+                          width={80}
+                          height={80}
                           className="h-20 w-20"
                         />
                       )}
