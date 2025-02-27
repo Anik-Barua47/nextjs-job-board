@@ -7,8 +7,13 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import JobListItem from "@/components/JobListItem";
 import Link from "next/link";
+import { Job } from "@prisma/client"; // Import Job type from Prisma
 
-const AdminDashboard = ({ unapprovedJobs }) => {
+interface AdminDashboardProps {
+  unapprovedJobs: Job[];
+}
+
+const AdminDashboard = ({ unapprovedJobs }: AdminDashboardProps) => {
   const role = useCurrentRole();
   const router = useRouter();
 

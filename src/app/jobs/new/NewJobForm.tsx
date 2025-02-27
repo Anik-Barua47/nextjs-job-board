@@ -212,6 +212,7 @@ export default function NewJobForm() {
                   <FormLabel>Company Logo</FormLabel>
                   <FormControl>
                     <Input
+                      disabled
                       type="file"
                       accept="image/*"
                       onChange={handleFileChange}
