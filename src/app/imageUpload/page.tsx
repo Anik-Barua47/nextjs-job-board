@@ -7,7 +7,7 @@ export default function ImageUpload() {
   return (
     <div>
       <div>Image</div>
-      <UploadImage />
+      {/* <UploadImage /> */}
     </div>
   );
 }

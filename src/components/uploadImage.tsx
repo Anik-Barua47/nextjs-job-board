@@ -1,32 +1,27 @@
 "use client";
 
+import { Upload } from "lucide-react";
 import { CldImage, CldUploadWidget } from "next-cloudinary";
-import { useState } from "react";
 
-const UploadImage = () => {
-  const [publicId, setPublicId] = useState("");
+const UploadImage = ({ onUpload }: { onUpload: (url: string) => void }) => {
   return (
     <>
-      {publicId && (
-        <CldImage src={publicId} alt={publicId} width={"300"} height={"300"} />
-      )}
       <CldUploadWidget
         uploadPreset="tu5jdthj"
-        onSuccess={({ event, info }) => {
-          console.log(event, info);
-          if (event === "success") {
-            if (typeof info !== "string" && info?.public_id) {
-              setPublicId(info.public_id);
-            }
-          }
+        onSuccess={(result) => {
+          const info = result.info as { secure_url: string };
+          onUpload(info.secure_url); // Send URL back to the parent
         }}
       >
         {({ open }) => (
           <button
-            className="rounded-lg bg-zinc-700 p-4 text-white"
+            type="button"
+            className="rounded-md border px-2.5 py-2 text-left text-sm"
             onClick={() => open()}
           >
-            Upload
+            <div className="flex items-center gap-2">
+              <Upload /> Upload Logo
+            </div>
           </button>
         )}
       </CldUploadWidget>

@@ -23,6 +23,7 @@ import { X } from "lucide-react";
 import { draftToMarkdown } from "markdown-draft-js";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import UploadImage from "@/components/uploadImage";
 
 export default function NewJobForm() {
   const form = useForm<CreateJobValues>({
@@ -123,22 +124,6 @@ export default function NewJobForm() {
             noValidate
             onSubmit={handleSubmit(onSubmit)}
           >
-            {/* <FormField
-              control={control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. frontend-developer" {...field} />
-                  </FormControl>
-                  {errors.slug && (
-                    <FormMessage>{errors.slug.message}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            /> */}
-
             {/* Job Title */}
             <FormField
               control={control}
@@ -207,16 +192,22 @@ export default function NewJobForm() {
             <FormField
               control={control}
               name="companyLogo"
-              render={() => (
-                <FormItem>
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
                   <FormLabel>Company Logo</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
+                    <>
+                      <UploadImage
+                        onUpload={(url) => setValue("companyLogo", url)}
+                      />
+                      {field.value && (
+                        <img
+                          src={field.value}
+                          alt="Company Logo"
+                          className="h-20 w-20"
+                        />
+                      )}
+                    </>
                   </FormControl>
                   {errors.companyLogo && (
                     <FormMessage>{errors.companyLogo.message}</FormMessage>

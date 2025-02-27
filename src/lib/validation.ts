@@ -10,7 +10,8 @@ const companyLogoSchema = z
   .string()
   .optional()
   .refine(
-    (value) => !value || value.startsWith("/uploads/"),
+    (value) =>
+      !value || value.startsWith("https://") || value.startsWith("/uploads/"),
     "Invalid image path",
   );
 
